@@ -1,4 +1,4 @@
-main{
+void main{
     let float id1;
     id1 := 200;
     printIO(maior(10, id1, 0));
