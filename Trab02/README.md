@@ -12,6 +12,6 @@ javacc Lugosi.jj
 javac *.java
 
 Execução:
-java Lugosi teste.lug
+java Lugosi prog1.lug
 
 ```
