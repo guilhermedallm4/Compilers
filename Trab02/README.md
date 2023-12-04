@@ -7,10 +7,11 @@
 ## Comandos para execução
 ```
 Compilação:
+javacc Lugosi.jj 
 
-
+javac *.java
 
 Execução:
-
+java Lugosi teste.lug
 
 ```
