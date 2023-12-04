@@ -1,7 +1,7 @@
 void main{
     let float id1;
-    id1 := 200;
-    printIO(maior(10, id1, 0));
+    id1 := 200.0;
+    printIO(maior(10.0, id1, 0.0));
 }
 
 def float maior(float arg1, float arg2, float arg3){
