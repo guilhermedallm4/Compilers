@@ -63,31 +63,44 @@ TOKEN :
 
 
 // MAIN -> "void" "main" "{" VARDECL SEQCOMANDOS "}"
+
 void Lugosi () :
 {Token t;}
-{
+ {
   <VOID> <MAIN> <ACHAVES> Vardecl() SeqComandos() <FCHAVES>
 }
-{
 
 
-// VARDECL -> VARDECL "let" TIPO TOKEN_id ";" | vazio
+
+/* 
+VARDECL -> "let" TIPO TOKEN_id ";" VARDECLLINE 
+VARDECLLINE -> "let" TIPO TOKEN_id ";" VARDECLLINE | vazio
+*/
 
 void Vardecl():
 {}
 {
 
-  (<LET> Tipo() TokenId <PONTOVIRGULA>)?
+  (<LET> Tipo() TokenId() <PONTOVIRGULA>  VardeclLine())
+
+}
+
+void VardeclLine():
+{}
+{
+
+  (<LET> Tipo() TokenId() <PONTOVIRGULA> VardeclLine())?
 
 }
 
 
 // TIPO -> "float" | "bool" | "void"
+
 void Tipo():
 {}
 {
 
-  <FLOAT> || <BOOL> || <VOID> 
+  <FLOAT> | <BOOL> | <VOID> 
 
 }
 
@@ -99,13 +112,25 @@ void TokenId():
 
 }
 
-// SEQCOMANDOS -> SEQCOMANDOS COMANDO | vazio
+
+/* 
+SEQCOMANDOS -> COMANDO SEQCOMANDOSLINE
+SEQCOMANDOSLINE -> COMANDO SEQCOMANDOSLINE | Vazio
+*/
 
 void SeqComandos():
 {}
 {
 
-  (Comando())*
+  (Comando() SeqComandosLine())
+
+}
+
+void SeqComandosLine():
+{}
+{
+
+  (Comando() SeqComandosLine())?
 
 }
 
@@ -122,47 +147,157 @@ COMANDO -> TOKEN_id ":=" EXP ";"
 void Comando():
 {}
 {
-
-
-
+(TokenId() TokenIdLine())
+| (<IF> Exp() <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA>)
+| (<WHILE> Exp() <DO> <ACHAVES> SeqComandos() <FCHAVES> <PONTOVIRGULA>)
+| (<RETURN> Exp() <PONTOVIRGULA>)
+| (<PRINTIO> Exp() <PONTOVIRGULA>)
 }
 
 
-(
-  <MAIN> { System.out.println("Palavra reservada: main");}
-| <VOID> { System.out.println("Palavra reservada: void");}
-| <ACHAVES> { System.out.println("Abre chaves: {");}
-| <FCHAVES> { System.out.println("Fecha chaves: }");}
-| <APAR> { System.out.println("Abre parenteses: (");}
-| <FPAR> { System.out.println("Fecha parenteses: )");}
-| <LET> { System.out.println("Palavra reservada: let");}
-| <PONTOVIRGULA> { System.out.println("Ponto e Virgula: ;");}
-| <FLOAT> { System.out.println("Palavra reservada: float");}
-| <BOOL> { System.out.println("Palavra reservada: bool");}
-| <ATRIBUICAO> { System.out.println("Atribuicao: :=");}
-| <IF> { System.out.println("Palavra reservada: if");}
-| <WHILE> { System.out.println("Palavra reservada: while");}
-| <DO> { System.out.println("Palavra reservada: do");}
-| <READIO> { System.out.println("Palavra reservada: readIO");}
-| <RETURN> { System.out.println("Palavra reservada: return");}
-| <PRINTIO> { System.out.println("Palavra reservada: printIO");}
-| <TRUE> { System.out.println("Palavra reservada: true");}
-| <FALSE> { System.out.println("Palavra reservada: false");}
-| <SOMA> { System.out.println("Operador de Soma: +");}
-| <SUB> { System.out.println("Operador de Subtracao: -");}
-| <MULT> { System.out.println("Operador de Multiplicacao: *");}
-| <DIV> { System.out.println("Operador de Divisao: /");}
-| <AND> { System.out.println("Operador Logico E: &&");}
-| <OR> { System.out.println("Operador Logico OU: ||");}
-| <MENOR> { System.out.println("Menor que: <");}
-| <MAIOR> { System.out.println("Maior que: >");}
-| <IGUALDADE> { System.out.println("Operador de Igualdade: ==");}
-| <VIRGULA> { System.out.println("Virgula: ,");}
-| <DEF> { System.out.println("Palavra reservada: def");}
-| t=<NUM> { System.out.println("Número: "+ t.image);}
-| t=<ID> { System.out.println("Identificador: "+ t.image);}
-)*
-<EOF> 
+/*
+COMANDO -> TokenId() TokenIdLine()
+TokenIdLine() -> ":=" EXP ";" | "(" LISTAEXP? ")" ";" | ":=" "readIO" "(" ")"
+*/
 
+void TokenIdLine():
+{}
+{
+
+  <ATRIBUICAO> TokenIdLineLine()
+  | <APAR> ListaExp() <FPAR> <PONTOVIRGULA>
+
+}
+
+void TokenIdLineLine():
+{}
+{
+
+  Exp() <PONTOVIRGULA> | <READIO> <APAR> <FPAR>
+
+}
+
+/*
+EXP -> FATOR EXPLINE 
+EXPLINE -> "(" EXP OP EXP ")" | Vazio
+*/
+
+void Exp():
+{}
+{
+
+  (Fator() ExpLine())
+
+}
+
+void ExpLine():
+{}
+{
+
+  (<APAR> ExpLine() Op() ExpLine() <FPAR>)?
+
+}
+
+/* 
+FATOR -> TOKEN_id FATORLINE ()
+| TOKEN_numliteral | "true" | "false"
+
+FATORLINE -> "(" LISTAEXP? ")"
+*/
+
+void Fator():
+{}
+{
+
+  (TokenId() FatorLine())
+  | Token_NumLiteral()
+  | <TRUE>
+  | <FALSE>
+
+}
+
+void FatorLine():
+{}
+{
+
+  (<APAR> ListaExp() <FPAR>)
+
+}
+
+void Token_NumLiteral():
+{}
+{
+
+  <NUM>
+
+}
+
+void Op():
+{}
+{
+
+  <SOMA>
+  | <SUB>
+  | <MULT>
+  | <DIV>
+  | <AND>
+  | <OR>
+  | <MENOR>
+  | <MAIOR>
+  | <IGUALDADE>
+
+}
+
+void ListaExp():
+{}
+{
+
+  (Exp() ListaExpLine())?
+
+}
+
+void ListaExpLine():
+{}
+{
+
+  (<VIRGULA> Exp() ListaExpLine())?
+
+}
+/*
+FUNC -> FUNC "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
+| "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
+*/
+
+void Func():
+{}
+{
+
+  <DEF> Tipo() TokenId() <APAR> ListaArg() <FPAR> <ACHAVES> Vardecl() SeqComandos() <FCHAVES> FuncLine()
+
+}
+
+void FuncLine():
+{}
+{
+
+  (<DEF> Tipo() TokenId() <APAR> ListaArg() <FPAR> <ACHAVES> Vardecl() SeqComandos() <FCHAVES> FuncLine())?
+
+}
+
+// LISTAARG -> TIPO TOKEN_id | LISTAARG "," TIPO TOKEN_id
+
+void ListaArg():
+{}
+{
+
+  Tipo() TokenId() ListaArgLine()
+
+}
+
+void ListaArgLine():
+{}
+{
+
+  (<VIRGULA> Tipo() TokenId() ListaArgLine())?
 
 }
