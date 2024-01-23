@@ -64,10 +64,16 @@ TOKEN :
 
 // MAIN -> "void" "main" "{" VARDECL SEQCOMANDOS "}"
 
-void Lugosi () :
+void Lugosi ():
 {Token t;}
- {
-  <VOID> <MAIN> <ACHAVES> Vardecl() SeqComandos() <FCHAVES>
+{
+  Main() (Func())?
+}
+
+void Main():
+{}
+{
+  <VOID> <MAIN> <ACHAVES> VarDecl() SeqComandos() <FCHAVES>
 }
 
 
@@ -77,21 +83,14 @@ VARDECL -> "let" TIPO TOKEN_id ";" VARDECLLINE
 VARDECLLINE -> "let" TIPO TOKEN_id ";" VARDECLLINE | vazio
 */
 
-void Vardecl():
+void VarDecl():
 {}
 {
 
-  (<LET> Tipo() TokenId() <PONTOVIRGULA>  VardeclLine())
+  (<LET> Tipo() TokenId() <PONTOVIRGULA> VarDecl())?
 
 }
 
-void VardeclLine():
-{}
-{
-
-  (<LET> Tipo() TokenId() <PONTOVIRGULA> VardeclLine())?
-
-}
 
 
 // TIPO -> "float" | "bool" | "void"
@@ -164,8 +163,8 @@ void TokenIdLine():
 {}
 {
 
-  <ATRIBUICAO> TokenIdLineLine()
-  | <APAR> ListaExp() <FPAR> <PONTOVIRGULA>
+  (<ATRIBUICAO> TokenIdLineLine())
+  | (<APAR> (ListaExp())? <FPAR> <PONTOVIRGULA>)
 
 }
 
@@ -173,7 +172,7 @@ void TokenIdLineLine():
 {}
 {
 
-  Exp() <PONTOVIRGULA> | <READIO> <APAR> <FPAR>
+  (Exp() <PONTOVIRGULA>) | (<READIO> <APAR> <FPAR>)
 
 }
 
@@ -185,44 +184,43 @@ EXPLINE -> "(" EXP OP EXP ")" | Vazio
 void Exp():
 {}
 {
-
-  (Fator() ExpLine())
-
+  (Fator()) | (<APAR> Exp() Op() Exp() <FPAR>) 
 }
 
+/*
 void ExpLine():
 {}
 {
-
   (<APAR> ExpLine() Op() ExpLine() <FPAR>)?
-
-}
-
-/* 
-FATOR -> TOKEN_id FATORLINE ()
-| TOKEN_numliteral | "true" | "false"
-
-FATORLINE -> "(" LISTAEXP? ")"
-*/
+}*/
 
 void Fator():
 {}
 {
-
-  (TokenId() FatorLine())
+  TokenId() FatorLine()
   | Token_NumLiteral()
   | <TRUE>
   | <FALSE>
-
 }
 
 void FatorLine():
 {}
 {
-
-  (<APAR> ListaExp() <FPAR>)
-
+  (<APAR> (ListaExp())? <FPAR>)?
 }
+
+void ListaExp():
+{}
+{
+  (Exp() ListaExpLine())
+}
+
+void ListaExpLine():
+{}
+{
+  (<VIRGULA> Exp() ListaExpLine())?
+}
+
 
 void Token_NumLiteral():
 {}
@@ -248,21 +246,7 @@ void Op():
 
 }
 
-void ListaExp():
-{}
-{
 
-  (Exp() ListaExpLine())?
-
-}
-
-void ListaExpLine():
-{}
-{
-
-  (<VIRGULA> Exp() ListaExpLine())?
-
-}
 /*
 FUNC -> FUNC "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
 | "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
@@ -272,7 +256,7 @@ void Func():
 {}
 {
 
-  <DEF> Tipo() TokenId() <APAR> ListaArg() <FPAR> <ACHAVES> Vardecl() SeqComandos() <FCHAVES> FuncLine()
+  (<DEF> Tipo() TokenId() <APAR> (ListaArg())? <FPAR> <ACHAVES> VarDecl() SeqComandos() <FCHAVES> FuncLine())
 
 }
 
@@ -280,7 +264,7 @@ void FuncLine():
 {}
 {
 
-  (<DEF> Tipo() TokenId() <APAR> ListaArg() <FPAR> <ACHAVES> Vardecl() SeqComandos() <FCHAVES> FuncLine())?
+  (<DEF> Tipo() TokenId() <APAR> (ListaArg())? <FPAR> <ACHAVES> VarDecl() SeqComandos() <FCHAVES> FuncLine())?
 
 }
 
