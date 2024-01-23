@@ -1,3 +1,11 @@
+/*
+javacc Lugosi.jj
+
+javac *.java
+
+java -cp . Lugosi prog1.lug
+*/
+
 PARSER_BEGIN(Lugosi)
 import java.io.*;
 public class Lugosi {
