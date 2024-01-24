@@ -7,10 +7,10 @@
 ## Comandos para execução
 ```
 Compilação:
-javac .\Compilador.java
+javac *.java
 
 
 Execução:
-java -cp . Compilador.java teste
+java -cp . Compilador teste
 
 ```
