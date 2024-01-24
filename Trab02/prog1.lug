@@ -1,15 +1,18 @@
 void main{
     let float id1;
-    id1 := 200.0;
-    printIO(maior(10.0, id1, 0.0));
+    id1 := 200;
+     
+    printIO maior(10, id1, 0); 
 }
 
 def float maior(float arg1, float arg2, float arg3){
-    if((arg1 > arg2)){
+
+    if(arg1 > arg2){
         return arg1;
     };
-    if((arg2 > arg3)){
+    if(arg2 > arg3){
         return arg2;
     };
     return arg3;
+    
 }
