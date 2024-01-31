@@ -70,13 +70,15 @@ TOKEN :
 }
 
 
-// MAIN -> "void" "main" "{" VARDECL SEQCOMANDOS "}"
+//LUGOSI -> MAIN FUNC?
 
 void Lugosi ():
 {Token t;}
 {
   Main() (Func())?
 }
+
+// MAIN -> "void" "main" "{" VARDECL SEQCOMANDOS "}"
 
 void Main():
 {}
@@ -142,11 +144,9 @@ void SeqComandosLine():
 }
 
 /*
-COMANDO -> TOKEN_id ":=" EXP ";"
-| TOKEN_id "(" LISTAEXP? ")" ";"
+COMANDO -> TOKEN_id TOKENIDLINE
 | "if" EXP "{" SEQCOMANDOS "}" ";"
-| "while" EXP "do" "{" SEQCOMANDOS "}" ";"
-| TOKEN_id ":=" "readIO" "(" ")"
+| "while" EXP "do" "{" SEQCOMANDOS "}" ";""
 | "return" EXP ";"
 | "printIO" EXP ";"
 */
@@ -163,8 +163,7 @@ void Comando():
 
 
 /*
-COMANDO -> TokenId() TokenIdLine()
-TokenIdLine() -> ":=" EXP ";" | "(" LISTAEXP? ")" ";" | ":=" "readIO" "(" ")"
+TOKENIDLINE -> ":=" TOKENIDLINELINE | "(" LISTAEXP? ")" ";" 
 */
 
 void TokenIdLine():
@@ -175,6 +174,9 @@ void TokenIdLine():
   | (<APAR> (ListaExp())? <FPAR> <PONTOVIRGULA>)
 
 }
+/*
+TOKENIDLINELINE -> EXP ";" | "readIO" "(" ")"
+*/
 
 void TokenIdLineLine():
 {}
@@ -184,9 +186,10 @@ void TokenIdLineLine():
 
 }
 
+
+
 /*
-EXP -> FATOR EXPLINE 
-EXPLINE -> "(" EXP OP EXP ")" | Vazio
+EXP -> "(" EXP OP EXP ")" | FATOR
 */
 
 void Exp():
@@ -196,11 +199,9 @@ void Exp():
 }
 
 /*
-void ExpLine():
-{}
-{
-  (<APAR> ExpLine() Op() ExpLine() <FPAR>)?
-}*/
+FATOR -> TOKEN_id FATORLINE | TOKEN_numliteral | "true" | "false"
+FATORLINE -> ("(" LISTAEXP? ")")?
+*/
 
 void Fator():
 {}
@@ -216,6 +217,11 @@ void FatorLine():
 {
   (<APAR> (ListaExp())? <FPAR>)?
 }
+
+/*
+LISTAEXP -> EXP LISTAEXPLINE
+LISTAEXPLINE -> ("," EXP LISTAEXPLINE)?
+*/
 
 void ListaExp():
 {}
@@ -256,8 +262,8 @@ void Op():
 
 
 /*
-FUNC -> FUNC "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
-| "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}"
+FUNC -> "def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}" FUNCLINE
+FUNCLINE -> ("def" TIPO TOKEN_id "(" LISTAARG? ")" "{" VARDECL SEQCOMANDOS "}" FUNCLINE)?
 */
 
 void Func():
@@ -275,9 +281,10 @@ void FuncLine():
   (<DEF> Tipo() TokenId() <APAR> (ListaArg())? <FPAR> <ACHAVES> VarDecl() SeqComandos() <FCHAVES> FuncLine())?
 
 }
-
-// LISTAARG -> TIPO TOKEN_id | LISTAARG "," TIPO TOKEN_id
-
+/*
+LISTAARG -> TIPO TOKEN_id LISTAARGLINE
+LISTAARGLINE -> ("," TIPO TOKEN_id LISTAARGLINE)?
+*/
 void ListaArg():
 {}
 {
